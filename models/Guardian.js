@@ -41,4 +41,11 @@ const GuardianSchema = new mongoose.Schema(
     }
 );
 
+GuardianSchema.methods.toJSON = function () {
+    var obj = this.toObject();
+    delete obj._id;
+    delete obj.__v;
+    return obj
+}
+
 module.exports = mongoose.model('Guardian', GuardianSchema);

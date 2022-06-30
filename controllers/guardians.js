@@ -1,6 +1,7 @@
 const uuid = require('uuid');
 const Guardian = require('../models/Guardian');
 
+
 //@desc     Get all guardians
 //@route    GET /api/v1/guardians
 //@access   Public
@@ -8,10 +9,9 @@ exports.getGuardians = async (req, res, next) => {
     try {
         const guardians = await Guardian.find();
 
-        res.status(200).json({
-            guardians
-        });
+        res.status(200).json(guardians);
     } catch (error) {
+        console.log(error);
         res.status(400).json({
             status: "BAD_REQUEST",
             message: 'Invalid request'
@@ -24,18 +24,18 @@ exports.getGuardians = async (req, res, next) => {
 //@access   Public
 exports.getGuardian = async (req, res, next) => {
     try {
-        const guardian = await Guardian.find().byGuardianId(req.params.id);
+        const guardianList = await Guardian.find().byGuardianId(req.params.id);
 
-        if (guardian.length === 0) {
+        if (guardianList.length === 0) {
             return res.status(404).json({
                 status: "NOT_FOUND",
                 message: "Guardian not found"
             })
         }
 
-        res.status(200).json({
-            guardian
-        })
+        const guardian = guardianList[0];
+
+        res.status(200).json(guardian);
     } catch (error) {
         console.log(error.message);
         res.status(400).json({
@@ -80,7 +80,7 @@ exports.replaceGuardian = async (req, res, next) => {
             runValidators: true
         });
 
-        if (guardian.length === 0) {
+        if (!guardian) {
             return res.status(404).json({
                 status: "NOT_FOUND",
                 message: "Guardian not found"
@@ -105,6 +105,13 @@ exports.replaceGuardian = async (req, res, next) => {
 //@access   Private
 exports.updateGuardian = async (req, res, next) => {
     try {
+        if (req.body.hasOwnProperty('guardianId')) {
+            return res.status(400).json({
+                status: "BAD_REQUEST",
+                message: "'guardianId' cannot be updated"
+            })
+        }
+
         const guardian = await Guardian.findOneAndUpdate({ guardianId: req.params.id }, req.body, {
             new: true,
             runValidators: true
@@ -117,19 +124,13 @@ exports.updateGuardian = async (req, res, next) => {
             })
         }
 
-        if ("guardianId" in req.body) {
-            return res.status(400).json({
-                status: "BAD_REQUEST",
-                message: "'guardianId' cannot be updated"
-            })
-        }
-
         res.status(200).json({
             status: "SUCCESS",
             message: "Guardian data is updated",
             guardian: guardian
         });
     } catch (error) {
+        console.log(error)
         res.status(400).json({
             status: "BAD_REQUEST",
             message: 'Invalid request'
