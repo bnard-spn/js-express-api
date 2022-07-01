@@ -32,12 +32,13 @@ const GuardianSchema = new mongoose.Schema(
     },
     {
         query: {
-            byGuardianId(guardianId) {
+            byGuardianId(id) {
                 return this.where({
-                    guardianId: new RegExp(guardianId, 'i')
+                    guardianId: id
                 });
             }
-        }
+        },
+        strict: "throw"
     }
 );
 

@@ -1,3 +1,4 @@
+const ErrorResponse = require('../utils/errorResponse')
 const uuid = require('uuid');
 const Guardian = require('../models/Guardian');
 
@@ -11,11 +12,7 @@ exports.getGuardians = async (req, res, next) => {
 
         res.status(200).json(guardians);
     } catch (error) {
-        console.log(error);
-        res.status(400).json({
-            status: "BAD_REQUEST",
-            message: 'Invalid request'
-        });
+        next(error);
     }
 }
 
@@ -27,21 +24,14 @@ exports.getGuardian = async (req, res, next) => {
         const guardianList = await Guardian.find().byGuardianId(req.params.id);
 
         if (guardianList.length === 0) {
-            return res.status(404).json({
-                status: "NOT_FOUND",
-                message: "Guardian not found"
-            })
+            return next(new ErrorResponse("Guardian not found", 404, "NOT_FOUND"));
         }
 
         const guardian = guardianList[0];
 
         res.status(200).json(guardian);
     } catch (error) {
-        console.log(error.message);
-        res.status(400).json({
-            status: "BAD_REQUEST",
-            message: 'Invalid request'
-        });
+        next(error);
     }
 }
 
@@ -61,10 +51,7 @@ exports.createGuardian = async (req, res, next) => {
                 guardian: guardian
             });
     } catch (error) {
-        res.status(400).json({
-            status: "BAD_REQUEST",
-            message: 'Invalid request'
-        });
+        next(error);
     }
 }
 
@@ -81,10 +68,7 @@ exports.replaceGuardian = async (req, res, next) => {
         });
 
         if (!guardian) {
-            return res.status(404).json({
-                status: "NOT_FOUND",
-                message: "Guardian not found"
-            })
+            return next(new ErrorResponse("Guardian not found", 404, "NOT_FOUND"));
         }
 
         res.status(200).json({
@@ -93,10 +77,7 @@ exports.replaceGuardian = async (req, res, next) => {
             guardian: guardian
         });
     } catch (error) {
-        res.status(400).json({
-            status: "BAD_REQUEST",
-            message: 'Invalid request'
-        });
+        next(error);
     }
 }
 
@@ -106,10 +87,7 @@ exports.replaceGuardian = async (req, res, next) => {
 exports.updateGuardian = async (req, res, next) => {
     try {
         if (req.body.hasOwnProperty('guardianId')) {
-            return res.status(400).json({
-                status: "BAD_REQUEST",
-                message: "'guardianId' cannot be updated"
-            })
+            return next(new ErrorResponse("'guardianId' cannot be updated", 400, "BAD_REQUEST"));
         }
 
         const guardian = await Guardian.findOneAndUpdate({ guardianId: req.params.id }, req.body, {
@@ -118,10 +96,7 @@ exports.updateGuardian = async (req, res, next) => {
         });
 
         if (!guardian) {
-            return res.status(404).json({
-                status: "NOT_FOUND",
-                message: "Guardian not found"
-            })
+            return next(new ErrorResponse("Guardian not found", 404, "NOT_FOUND"));
         }
 
         res.status(200).json({
@@ -130,11 +105,7 @@ exports.updateGuardian = async (req, res, next) => {
             guardian: guardian
         });
     } catch (error) {
-        console.log(error)
-        res.status(400).json({
-            status: "BAD_REQUEST",
-            message: 'Invalid request'
-        });
+        next(error);
     }
 }
 
@@ -146,10 +117,7 @@ exports.deleteGuardian = async (req, res, next) => {
         const guardian = await Guardian.findOneAndDelete({ guardianId: req.params.id });
 
         if (!guardian) {
-            return res.status(404).json({
-                status: "NOT_FOUND",
-                message: "Guardian not found"
-            })
+            return next(new ErrorResponse("Guardian not found", 404, "NOT_FOUND"));
         }
 
         res.status(200).json({
@@ -157,9 +125,6 @@ exports.deleteGuardian = async (req, res, next) => {
             message: "Guardian data is deleted"
         });
     } catch (error) {
-        res.status(400).json({
-            status: "BAD_REQUEST",
-            message: 'Invalid request'
-        });
+        next(error);
     }
 }
