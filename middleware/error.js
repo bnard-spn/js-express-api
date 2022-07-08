@@ -5,10 +5,11 @@ const errorHandler = (err, req, res, next) => {
     error.message = err.message;
 
     //Log to console for dev
-    // console.log(err);
+    //console.log(err.name);
 
     //Mongoose duplicate key
     if (err.code === 11000) {
+        console.log(err);
         const message = 'Duplicate field for primary key entered';
         error = new ErrorResponse(message, 400, "BAD_REQUEST");
     }

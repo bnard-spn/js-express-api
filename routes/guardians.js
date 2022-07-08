@@ -10,16 +10,18 @@ const {
 
 const router = express.Router();
 
+const { protect, authorize } = require('../middleware/auth');
+
 router
     .route('/')
     .get(getGuardians)
-    .post(createGuardian);
+    .post(protect, authorize('publisher', 'user'), createGuardian);
 
 router
     .route('/:id')
     .get(getGuardian)
-    .put(replaceGuardian)
-    .patch(updateGuardian)
-    .delete(deleteGuardian);
+    .put(protect, authorize('publisher'), replaceGuardian)
+    .patch(protect, authorize('publisher'), updateGuardian)
+    .delete(protect, authorize('publisher'), deleteGuardian);
 
 module.exports = router;

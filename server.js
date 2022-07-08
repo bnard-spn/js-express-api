@@ -13,6 +13,8 @@ connectDB();
 //Route files
 const guardians = require('./routes/guardians');
 const keyblades = require('./routes/keyblades');
+const auth = require('./routes/auth');
+
 const logger = require('./middleware/logger');
 
 const app = express();
@@ -28,6 +30,7 @@ if (process.env.NODE_ENV === 'development') {
 //Mount routers
 app.use('/api/v1/guardians', guardians);
 app.use('/api/v1/keyblades', keyblades);
+app.use('/api/v1/auth', auth)
 
 app.use(errorHandler);
 
